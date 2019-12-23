@@ -36,9 +36,20 @@ var runCmd = &cobra.Command{
 	},
 }
 
+// Add the "version" subcommand.
+var versionCmd = &cobra.Command{
+	Use:   "version",
+	Short: "A brief description of the command",
+	Long:  `A longer description that spans multiple lines for the command`,
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("version: 0.1.0")
+	},
+}
+
 // Initialize the subcommands.
 func init() {
 	rootCmd.AddCommand(runCmd)
+	rootCmd.AddCommand(versionCmd)
 }
 
 // Execute subcommands as part of main invocation function.
