@@ -29,4 +29,4 @@ The end goal is for the requirements to be as minimal as possible.
 
 ## Notes
 
-The client-go dependency version was changed to "0.17.0" since the library switched to matching Kubernetes version strings.
+The client-go dependency version was manually changed (in *go.mod*) to "0.17.0" since the library switched to matching Kubernetes version strings.
