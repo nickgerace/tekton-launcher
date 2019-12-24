@@ -51,25 +51,30 @@ func Launch() {
 	// Define the TaskRun CRD for lookup.
 	taskRunResource := schema.GroupVersionResource{Group: "tekton.dev", Version: "v1alpha1", Resource: "taskruns"}
 
+    // Load the user-specified parameters.
+    image := "debian:10-slim"
+    command := []string{
+        "echo",
+    }
+    args := []string{
+        "Hello world!",
+    }
+
 	// Construct the TaskRun object for creation.
 	taskRun := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"apiVersion": "tekton.dev/v1alpha1",
 			"kind":       "TaskRun",
 			"metadata": map[string]interface{}{
-				"name": "example-taskrun",
+				"name": "launched-taskrun",
 			},
 			"spec": map[string]interface{}{
 				"taskSpec": map[string]interface{}{
 					"steps": []map[string]interface{}{{
-						"name":  "debian",
-						"image": "debian:10-slim",
-						"command": []string{
-							"echo",
-						},
-						"args": []string{
-							"Hello world!",
-						},
+						"name":  "taskcontainer",
+						"image": image,
+						"command": command,
+						"args": args,
 						"imagePullPolicy": "Always",
 					}},
 				},
