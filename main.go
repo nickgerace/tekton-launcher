@@ -32,7 +32,7 @@ var runCmd = &cobra.Command{
 	Short: "A brief description of the command",
 	Long:  `A longer description that spans multiple lines for the command`,
 	Run: func(cmd *cobra.Command, args []string) {
-		util.Launch()
+		util.Launch(args)
 	},
 }
 

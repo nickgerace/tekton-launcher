@@ -15,10 +15,10 @@ delete-pipelines:
 	-kubectl delete --filename https://storage.googleapis.com/tekton-releases/pipeline/latest/release.yaml
 
 create-namespace:
-	kubectl apply -f $(MAKEPATH)/namespace.yaml
+	kubectl apply -f $(MAKEPATH)/resources/namespace.yaml
 
 delete-namespace:
-	-kubectl delete -f $(MAKEPATH)/namespace.yaml
+	-kubectl delete -f $(MAKEPATH)/resources/namespace.yaml
 
 install-example:
 	kubectl apply -f $(MAKEPATH)/example.yaml

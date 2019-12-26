@@ -6,21 +6,19 @@ A simple Tekton launcher for Kubernetes.
 
 ## Requirements
 
-Currently, the exact version strings required have not been confirmed.
-Moreover, the requirements are constantly changing.
-The end goal is for the requirements to be as minimal as possible.
+Even though the dependencies and version strings changing (pre-alpha), the end goal is for the requirements to be as minimal as possible.
 
 *Permanent Requirements*
 
-- Kubernetes cluster
-- Tekton Pipelines (installation make target included)
-- Tekton Dashboard (optional, not included)
+- Kubernetes cluster v?
+- [Tekton Pipelines](https://github.com/tektoncd/pipeline) v? (make target included)
+- [Tekton Dashboard](https://github.com/tektoncd/dashboard) v? (optional, make target not included)
 
 *Temporary Requirements*
 
 - Go 1.13+
-- Kubectl
-- Make
+- Kubectl v?
+- Make v?
 
 ## License
 

@@ -15,6 +15,9 @@ package util
 import (
 	"flag"
 	"fmt"
+    "os"
+	"gopkg.in/yaml.v3"
+	"io/ioutil"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -25,7 +28,18 @@ import (
 	"path/filepath"
 )
 
-func Launch() {
+type LauncherConfig struct {
+	Image   string   `yaml:"image,omitempty"`
+	Command []string `yaml:"command,omitempty"`
+	Args    []string `yaml:"args,omitempty"`
+}
+
+func Launch(args []string) {
+
+	// Verify that at least one arg has been supplied.
+	if len(args) < 1 {
+        log.Fatal("Must supply path to Launcher YAML as first argument.")
+	}
 
 	// Get kube config from default location or from flag.
 	var kubeconfig *string
@@ -51,14 +65,31 @@ func Launch() {
 	// Define the TaskRun CRD for lookup.
 	taskRunResource := schema.GroupVersionResource{Group: "tekton.dev", Version: "v1alpha1", Resource: "taskruns"}
 
-    // Load the user-specified parameters.
-    image := "debian:10-slim"
-    command := []string{
-        "echo",
+	// Read target Launcher YAML and store into struct.
+	launcherConfig := LauncherConfig{}
+
+    // Get absolute path of the first argument.
+	abs, err := filepath.Abs(args[0])
+	if err != nil {
+		log.Fatal(err)
+	}
+
+    // Open the file as read-only and close after reading contents into memory.
+    file, err := os.OpenFile(abs, os.O_RDWR, 0444)
+    if err != nil {
+        log.Fatal(err)
     }
-    args := []string{
-        "Hello world!",
-    }
+	data, err := ioutil.ReadAll(file)
+	if err != nil {
+		log.Fatal(err)
+	}
+    file.Close()
+
+    // Unmarshal the raw data (YAML format) into the struct.
+	err = yaml.Unmarshal(data, &launcherConfig)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// Construct the TaskRun object for creation.
 	taskRun := &unstructured.Unstructured{
@@ -71,10 +102,10 @@ func Launch() {
 			"spec": map[string]interface{}{
 				"taskSpec": map[string]interface{}{
 					"steps": []map[string]interface{}{{
-						"name":  "taskcontainer",
-						"image": image,
-						"command": command,
-						"args": args,
+						"name":            "taskcontainer",
+						"image":           launcherConfig.Image,
+						"command":         launcherConfig.Command,
+						"args":            launcherConfig.Args,
 						"imagePullPolicy": "Always",
 					}},
 				},
