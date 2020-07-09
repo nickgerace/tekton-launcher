@@ -32,8 +32,8 @@ import (
 )
 
 type LauncherConfig struct {
-	Image   string   `yaml:"image,omitempty"`
-	Command []string `yaml:"command,omitempty"`
+	Image   string   `yaml:"image"`
+	Command []string `yaml:"command"`
 	Args    []string `yaml:"args,omitempty"`
 }
 
