@@ -13,19 +13,22 @@ https://github.com/nickgerace/tekton-launcher
 package util
 
 import (
+	"context"
 	"flag"
 	"fmt"
-    "os"
-	"gopkg.in/yaml.v3"
 	"io/ioutil"
+	"log"
+	"os"
+	"path/filepath"
+
+	"gopkg.in/yaml.v3"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/homedir"
-	"log"
-	"path/filepath"
 )
 
 type LauncherConfig struct {
@@ -35,13 +38,10 @@ type LauncherConfig struct {
 }
 
 func Launch(args []string) {
-
-	// Verify that at least one arg has been supplied.
 	if len(args) < 1 {
-        log.Fatal("Must supply path to Launcher YAML as first argument.")
+		log.Fatal("Must supply path to Launcher YAML as first argument.")
 	}
 
-	// Get kube config from default location or from flag.
 	var kubeconfig *string
 	if home := homedir.HomeDir(); home != "" {
 		kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
@@ -50,48 +50,37 @@ func Launch(args []string) {
 	}
 	flag.Parse()
 
-	// Build config from the selected path.
 	config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// Create dynamic config.
 	client, err := dynamic.NewForConfig(config)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// Define the TaskRun CRD for lookup.
 	taskRunResource := schema.GroupVersionResource{Group: "tekton.dev", Version: "v1alpha1", Resource: "taskruns"}
-
-	// Read target Launcher YAML and store into struct.
 	launcherConfig := LauncherConfig{}
 
-    // Get absolute path of the first argument.
 	abs, err := filepath.Abs(args[0])
 	if err != nil {
 		log.Fatal(err)
 	}
-
-    // Open the file as read-only and close after reading contents into memory.
-    file, err := os.OpenFile(abs, os.O_RDWR, 0444)
-    if err != nil {
-        log.Fatal(err)
-    }
+	file, err := os.OpenFile(abs, os.O_RDWR, 0444)
+	if err != nil {
+		log.Fatal(err)
+	}
 	data, err := ioutil.ReadAll(file)
 	if err != nil {
 		log.Fatal(err)
 	}
-    file.Close()
-
-    // Unmarshal the raw data (YAML format) into the struct.
+	file.Close()
 	err = yaml.Unmarshal(data, &launcherConfig)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// Construct the TaskRun object for creation.
 	taskRun := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"apiVersion": "tekton.dev/v1alpha1",
@@ -113,10 +102,9 @@ func Launch(args []string) {
 		},
 	}
 
-	// Create the Tekton TaskRun in the cluster.
 	fmt.Println("Creating TaskRun...")
 	namespace := "default"
-	result, err := client.Resource(taskRunResource).Namespace(namespace).Create(taskRun, metav1.CreateOptions{})
+	result, err := client.Resource(taskRunResource).Namespace(namespace).Create(context.Background(), taskRun, metav1.CreateOptions{})
 	if err != nil {
 		log.Fatal(err)
 	}

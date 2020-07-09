@@ -1,14 +1,10 @@
 module github.com/nickgerace/tekton-launcher
 
-go 1.13
+go 1.14
 
 require (
-	github.com/imdario/mergo v0.3.8 // indirect
-	github.com/spf13/cobra v0.0.5
-	golang.org/x/oauth2 v0.0.0-20191202225959-858c2ad4c8b6 // indirect
-	golang.org/x/time v0.0.0-20191024005414-555d28b269f0 // indirect
-	gopkg.in/yaml.v3 v3.0.0-20191120175047-4206685974f2
-	k8s.io/apimachinery v0.17.0
-	k8s.io/client-go v0.17.0
-	k8s.io/utils v0.0.0-20191218082557-f07c713de883 // indirect
+	github.com/spf13/cobra v1.0.0
+	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776
+	k8s.io/apimachinery v0.18.5
+	k8s.io/client-go v0.18.5
 )

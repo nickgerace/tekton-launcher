@@ -1,28 +1,27 @@
 MAKEPATH:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 NAME:=tekton-launcher
 
-build: cleanup
+demo: install-tekton build
+	$(MAKEPATH)/$(NAME) run $(MAKEPATH)/examples/example.yaml
+
+build: fmt-and-vet test
 	cd $(MAKEPATH); go build -o $(NAME) .
 
-cleanup: 
+fmt-and-vet: 
 	cd $(MAKEPATH); go fmt ./...
 	cd $(MAKEPATH); go vet ./...
 
-install-pipelines:
-	kubectl apply --filename https://storage.googleapis.com/tekton-releases/pipeline/latest/release.yaml
+test:
+	cd $(MAKEPATH); go test ./...
 
-delete-pipelines:
+cleanup-cluster: delete-tasks-and-taskruns uninstall-tekton
+
+install-tekton:
+	-kubectl apply --filename https://storage.googleapis.com/tekton-releases/pipeline/latest/release.yaml
+
+uninstall-tekton:
 	-kubectl delete --filename https://storage.googleapis.com/tekton-releases/pipeline/latest/release.yaml
 
-create-namespace:
-	kubectl apply -f $(MAKEPATH)/resources/namespace.yaml
-
-delete-namespace:
-	-kubectl delete -f $(MAKEPATH)/resources/namespace.yaml
-
-install-example:
-	kubectl apply -f $(MAKEPATH)/example.yaml
-
-delete-example:
+delete-tasks-and-taskruns:
 	-kubectl delete taskruns.tekton.dev --all
 	-kubectl delete tasks.tekton.dev --all

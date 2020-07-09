@@ -1,4 +1,3 @@
-# Tekton Launcher YAML Template
 image: debian:10-slim
 command:
   - "echo"
