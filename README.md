@@ -2,6 +2,8 @@
 
 **author: [Nick Gerace](https://nickgerace.dev)**
 
+![](https://github.com/nickgerace/tekton-launcher/.github/workflows/go.yml/badge.svg)
+
 A simple Tekton launcher for Kubernetes.
 
 ## Requirements
